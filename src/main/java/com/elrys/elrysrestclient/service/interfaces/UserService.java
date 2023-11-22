@@ -4,6 +4,6 @@ import com.elrys.elrysrestclient.model.UserModel;
 import com.elrys.elrysrestclient.response.BodyResponse;
 
 public interface UserService {
-    BodyResponse register(UserModel userModel) throws Exception;
-    BodyResponse login(UserModel userModel) throws Exception;
+    BodyResponse<Object> register(UserModel userModel) throws Exception;
+    BodyResponse<Object> login(UserModel userModel) throws Exception;
 }
