@@ -5,9 +5,11 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
 
+import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +31,13 @@ public class ElasticConfiguration {
                 .build();
     }
 
-    public ElasticsearchTransport transport(){
-         return new RestClientTransport(restClient(), new JacksonJsonpMapper());
-
+    public ElasticsearchTransport transport() {
+        return new RestClientTransport(
+                restClient(),
+                new JacksonJsonpMapper(new ObjectMapper().registerModule(new JavaTimeModule()))
+        );
     }
+
 
 
 
