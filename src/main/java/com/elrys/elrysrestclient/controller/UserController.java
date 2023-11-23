@@ -28,4 +28,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(response);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<BodyResponse<Object>> login(@RequestBody UserModel userModel) throws Exception {
+        BodyResponse<Object> response = service.login(userModel);
+        if (response.getStatus().equals("Success")){
+            return ResponseEntity.ok()
+                    .body(response);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(response);
+    }
 }

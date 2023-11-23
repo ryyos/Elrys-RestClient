@@ -20,8 +20,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticConfiguration {
 
-    @Value("${service.elastic.host}")
-    private String host;
+    private final String host = "http://192.168.20.90:9200";
 
     @Bean
     public ElasticsearchClient client(){
