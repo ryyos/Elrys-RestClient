@@ -7,10 +7,7 @@ import com.elrys.elrysrestclient.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v3")
 @RestController
@@ -41,9 +38,20 @@ public class UserController {
                 .body(response);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<BodyResponse<Object>> login(@RequestBody DataModel dataModel) throws Exception {
         BodyResponse<Object> response = service.update(dataModel);
+        if (response.getStatus().equals("Success")){
+            return ResponseEntity.ok()
+                    .body(response);
+        }
+        return ResponseEntity.status(404)
+                .body(response);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<BodyResponse<Object>> delete(@RequestBody UserModel userModel) throws Exception {
+        BodyResponse<Object> response = service.delete(userModel);
         if (response.getStatus().equals("Success")){
             return ResponseEntity.ok()
                     .body(response);

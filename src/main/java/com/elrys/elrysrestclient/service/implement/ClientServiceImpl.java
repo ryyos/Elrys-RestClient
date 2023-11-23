@@ -1,16 +1,19 @@
 package com.elrys.elrysrestclient.service.implement;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.DeleteResponse;
-import co.elastic.clients.elasticsearch.core.ExistsRequest;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryFieldBuilders;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.termvectors.Term;
 import com.elrys.elrysrestclient.configuration.UtilsConfiguration;
+import com.elrys.elrysrestclient.enums.Index;
 import com.elrys.elrysrestclient.model.DataModel;
 import com.elrys.elrysrestclient.model.LoginModel;
 import com.elrys.elrysrestclient.model.UserModel;
 import com.elrys.elrysrestclient.service.interfaces.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
@@ -28,7 +31,7 @@ public class ClientServiceImpl implements ClientService {
 
 
     @Override
-    public IndexResponse postRequest(String index, String id, Object bodyRequest) throws Exception {
+    public void postRequest(String index, String id, Object bodyRequest) throws Exception {
 
         IndexRequest<Object> request = switch (bodyRequest.getClass().getSimpleName()) {
             case "UserModel" -> {
@@ -66,8 +69,7 @@ public class ClientServiceImpl implements ClientService {
          *  @return
          *  IndexResponse response = client.index(request);
          */
-
-        return client.index(request);
+        client.index(request);
     }
 
     @Override
@@ -106,7 +108,37 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public DeleteResponse deleteRequest(String index, Object bodyRequest) throws Exception {
-        return null;
+    public void deleteRequest(String index, Object bodyRequest) throws Exception {
+        UserModel userModel = (UserModel) bodyRequest;
+        DeleteRequest deleteRequest = new DeleteRequest.Builder()
+                .index(index)
+                .id(utils
+                        .encode()
+                        .idEncoder(userModel))
+                .build();
+
+        client.delete(deleteRequest);
+    }
+
+    @Override
+    public void deleteByQueryRequest(String index, Object bodyRequest) throws Exception {
+        UserModel userModel = (UserModel) bodyRequest;
+        String encodeId = utils
+                .encode()
+                .idEncoder(userModel);
+
+
+        DeleteByQueryRequest delete = new DeleteByQueryRequest.Builder()
+                .index(index)
+                .query(query -> query
+                        .term(term -> term
+                                .field("id.keyword")
+                                .value(encodeId)
+                        )
+                )
+                .build();
+
+        client.deleteByQuery(delete);
+
     }
 }

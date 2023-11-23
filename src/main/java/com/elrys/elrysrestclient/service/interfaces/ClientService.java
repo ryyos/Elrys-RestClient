@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public interface ClientService {
 
-    IndexResponse postRequest(String index, String id, Object bodyRequest) throws Exception;
-
+    void postRequest(String index, String id, Object bodyRequest) throws Exception;
+    void deleteRequest(String index, Object bodyRequest) throws Exception;
     Boolean existRequest(String index, Object bodyRequest) throws Exception;
-    DeleteResponse deleteRequest(String index, Object bodyRequest) throws Exception;
+    void deleteByQueryRequest(String index, Object bodyRequest) throws Exception;
 
 }
