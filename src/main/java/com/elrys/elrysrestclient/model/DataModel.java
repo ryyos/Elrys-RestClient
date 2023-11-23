@@ -24,7 +24,7 @@ public class DataModel {
     private String password;
 
     @Nullable
-    @Schema(name = "userName", defaultValue = "ryosoraa")
+    @Schema(name = "username", defaultValue = "ryosoraa")
     private String username;
 
     @Nullable

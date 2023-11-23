@@ -39,6 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public BodyResponse<Object> register(UserModel userModel) throws Exception {
+        String idrelations = utils.encode().idEncoder(userModel);
 
         if(client.existRequest(Index.MAIN.getIndex(), userModel)){
             return BodyResponse.<Object>builder()
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
                 .status("Success")
                 .data(client.postRequest(
                         Index.MAIN.getIndex(),
-                        utils.encode().idEncoder(userModel) ,
+                        idrelations ,
                         userModel))
                 .message("Register successfully")
                 .build();
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public BodyResponse<Object> login(UserModel userModel) throws Exception {
-        String idrelations = utils.encode().idEncoder(userModel);
+        String idrelations = String.valueOf(UUID.randomUUID());
 
         if(!client.existRequest(Index.MAIN.getIndex(), userModel)){
             return BodyResponse.<Object>builder()
@@ -80,8 +81,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public BodyResponse<Object> update(DataModel dataModel) throws Exception {
-        return null;
+        String idrelations = utils.encode().idEncoder(dataModel);
+
+        if(!client.existRequest(Index.MAIN.getIndex(), dataModel)){
+            return BodyResponse.<Object>builder()
+                    .status("Failed")
+                    .message("User Not Found")
+                    .build();
+        }
+
+        return BodyResponse.<Object>builder()
+                .status("Success")
+                .data(client.postRequest(
+                        Index.MAIN.getIndex(),
+                        idrelations,
+                        dataModel))
+                .message("Login successfully")
+                .build();
     }
+
 
     @Override
     public BodyResponse<Object> delete(UserModel userModel) throws Exception {

@@ -1,5 +1,6 @@
 package com.elrys.elrysrestclient.controller;
 
+import com.elrys.elrysrestclient.model.DataModel;
 import com.elrys.elrysrestclient.model.UserModel;
 import com.elrys.elrysrestclient.response.BodyResponse;
 import com.elrys.elrysrestclient.service.interfaces.UserService;
@@ -36,7 +37,18 @@ public class UserController {
             return ResponseEntity.ok()
                     .body(response);
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(404)
+                .body(response);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<BodyResponse<Object>> login(@RequestBody DataModel dataModel) throws Exception {
+        BodyResponse<Object> response = service.update(dataModel);
+        if (response.getStatus().equals("Success")){
+            return ResponseEntity.ok()
+                    .body(response);
+        }
+        return ResponseEntity.status(404)
                 .body(response);
     }
 }

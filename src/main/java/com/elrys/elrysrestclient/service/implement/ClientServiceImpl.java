@@ -1,6 +1,7 @@
 package com.elrys.elrysrestclient.service.implement;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.ExistsRequest;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
@@ -38,14 +39,25 @@ public class ClientServiceImpl implements ClientService {
                         .document(new DataModel((userModel)))
                         .build();
             }
+
             case "LoginModel" -> {
                 LoginModel loginModel = (LoginModel) bodyRequest;
                 yield new IndexRequest.Builder<>()
                         .index(index)
-                        .id(String.valueOf(UUID.randomUUID()))
+                        .id(id)
                         .document(loginModel)
                         .build();
             }
+
+            case "DataModel" -> {
+                DataModel dataModel = (DataModel) bodyRequest;
+                yield new IndexRequest.Builder<>()
+                        .index(index)
+                        .id(id)
+                        .document(dataModel)
+                        .build();
+            }
+
             default -> throw new IllegalArgumentException("Invalid model type");
 
         };
@@ -54,23 +66,47 @@ public class ClientServiceImpl implements ClientService {
          *  @return
          *  IndexResponse response = client.index(request);
          */
+
         return client.index(request);
     }
 
     @Override
     public Boolean existRequest(String index, Object bodyRequest) throws Exception {
-        ExistsRequest request = new ExistsRequest.Builder()
-                .index(index)
-                .id(utils
-                        .encode()
-                        .idEncoder((UserModel) bodyRequest))
-                .refresh(true)
-                .build();
+
+        ExistsRequest request = switch (bodyRequest.getClass().getSimpleName()) {
+            case "UserModel" -> {
+                UserModel userModel = (UserModel) bodyRequest;
+                yield new ExistsRequest.Builder()
+                        .index(index)
+                        .id(utils
+                                .encode()
+                                .idEncoder(userModel))
+                        .refresh(true)
+                        .build();
+            }
+
+            case "DataModel" -> {
+                DataModel dataModel = (DataModel) bodyRequest;
+                yield new ExistsRequest.Builder()
+                        .index(index)
+                        .id(utils
+                                .encode()
+                                .idEncoder(dataModel))
+                        .refresh(true)
+                        .build();
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + bodyRequest.getClass().getSimpleName());
+        };
 
         /**
          *  @return
          *  BooleanResponse exists = client.exists(request);
          */
         return client.exists(request).value();
+    }
+
+    @Override
+    public DeleteResponse deleteRequest(String index, Object bodyRequest) throws Exception {
+        return null;
     }
 }
